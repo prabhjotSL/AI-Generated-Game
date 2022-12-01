@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Game</title>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <script>
+      // Set up the canvas
+      var canvas = document.getElementById("myCanvas");
+      var ctx = canvas.getContext("2d");
+
+      // Define the game objects
+      var x = 20;
+      var y = 20;
+      var size = 20;
+      var dx = 1;
+      var dy = 1;
+      var loopId;
+
+      // Define the circle object
+      var circle = {
+        x: 250,
+        y: 250,
+        radius: 15
+      }
+
+      // Define the score variable
+      var score = 0;
+
+      // Increment the score every second
+      setInterval(function() {
+        score++;
+      }, 1000);
+
+      // Add an event listener for the arrow keys
+      window.addEventListener("keydown", function(event) {
+        // Check which key was pressed
+        if (event.key === "ArrowUp") {
+          // Move the circle up
+          circle.y -= 10;
+        } else if (event.key === "ArrowDown") {
+          // Move the circle down
+          circle.y += 10;
+        } else if (event.key === "ArrowLeft") {
+          // Move the circle left
+          circle.x -= 10;
+        } else if (event.key === "ArrowRight") {
+          // Move the circle right
+          circle.x += 10;
+        }
+      });
+
+      // Define the game logic
+      function update() {
+        // Update the game state
+        x += dx;
+        y += dy;
+
+        // Check if the square has hit the edge of the canvas
+        if (x + size > canvas.width || x < 0) {
+          dx = -dx;
+        }
+        if (y + size > canvas.height || y < 0) {
+          dy = -dy;
+        }
+
+        // Add some randomness to the movement
+        dx += Math.random() - 0.5;
+        dy += Math.random() - 0.5;
+
+        // Check for collisions between the circle and the rectangle
+        if (circle.x + circle.radius > x && circle.x - circle.radius < x + size &&
+            circle.y + circle.radius > y && circle.y - circle.radius < y + size) {
+          // The circle and rectangle are colliding, so pause the game loop
+          cancelAnimationFrame(loopId);
+
+          // Show an alert with the final score
+          alert("Game Over! Your final score is " + score);
+
+          // Ask the player if they want to restart the game
+          if (confirm("Do you want to restart the game?")) {
+            // Reset the game state
+            x = 20;
+            y = 20;
+            dx = 1;
+            dy = 1;
+            circle.x = 250;
+            circle.y = 250;
+            score = 0;
+
+            // Start the game loop again
+            loopId = requestAnimationFrame(loop);
+          }
+        }
+      }
+
+      // Define the game drawing
+      function draw() {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the rectangle
+        ctx.fillStyle = "red";
+        ctx.fillRect(x, y, size, size);
+
+        // Draw the circle
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+
+       
+        // Draw the score
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText("Score: " + score, 10, 20);
+      }
+      
+      // Define the game loop
+      function loop() {
+        update();
+        draw();
+        loopId = requestAnimationFrame(loop);
+      }
+
+      // Start the game
+      loop();
+    </script>
+  </body>
+</html>
